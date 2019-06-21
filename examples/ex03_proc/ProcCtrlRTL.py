@@ -2,6 +2,7 @@
 ==========================================================================
  ProcCtrlRTL.py
 ==========================================================================
+Control logic for the RTL TinyRV0 processor.
 
 Author : Shunning Jiang
   Date : June 13, 2019
@@ -337,7 +338,7 @@ class ProcCtrl( Component ):
       # ''' TUTORIAL TASK ''''''''''''''''''''''''''''''''''''''''''''''''
       # Implement instruction AND in RTL processor
       # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-      # Add a single line to set up signals for  AND instruction
+      # Add a single line to set up control signals for AND instruction.
 
       else:               s.cs = concat( n, br_x,   n, imm_x, bm_x,   n, alu_x,   nr, wm_x, n,  n, n )
 

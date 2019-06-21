@@ -1,7 +1,12 @@
-#=========================================================================
-# ProcCL
-#=========================================================================
+"""
+==========================================================================
+ ProcFL
+==========================================================================
+TinyRV0 FL proc.
 
+Author : Shunning Jiang
+  Date : June 14, 2019
+"""
 from __future__ import absolute_import, division, print_function
 
 from collections import deque
@@ -68,7 +73,7 @@ class ProcFL( Component ):
         # Implement instruction AND in FL processor
         # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         # Make an "elif" statement here to implement instruction AND
-        # that applies bit-wise "and" operator to rs1 and rs2 and returns
+        # that applies bit-wise "and" operator to rs1 and rs2 and stores
         # the result to rd
 
         elif inst_name == "addi":
