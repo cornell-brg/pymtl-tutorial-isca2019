@@ -7,7 +7,7 @@
 #
 #  --proc-impl         {fl,cl,rtl}
 #  --xcel-impl         {fl,cl,rtl,null}
-#  --input <dataset>   {cksum-xcel, cksum-null}
+#  --bmark <dataset>   {cksum-xcel, cksum}
 #  --translate         Simulate translated and imported DUTs
 #  --trace             Display line tracing
 #  --limit             Set max number of cycles, default=100000
@@ -79,8 +79,8 @@ def parse_cmdline():
   p.add_argument( "--proc-impl", default="rtl", choices=["fl", "cl", "rtl"] )
   p.add_argument( "--xcel-impl", default="rtl", choices=["fl", "cl", "rtl", "null"] )
   p.add_argument( "--translate", action="store_true" )
-  p.add_argument( "--input", default="cksum-xcel",
-                             choices=["cksum-null", "cksum-xcel"] )
+  p.add_argument( "--bmark", default="cksum-xcel",
+                             choices=["cksum", "cksum-xcel"] )
   p.add_argument( "--limit", default=100000, type=int )
 
   opts = p.parse_args()
@@ -99,9 +99,9 @@ xcel_impl_dict = {
   "null" : NullXcelRTL,
 }
 
-input_dict = {
+bmark_dict = {
   "cksum-xcel" : ubmark_cksum_xcel_roll,
-  "cksum-null" : ubmark_cksum_roll
+  "cksum"      : ubmark_cksum_roll
 }
 
 class TestHarness(Component):
@@ -110,30 +110,24 @@ class TestHarness(Component):
   # constructor
   #-----------------------------------------------------------------------
 
-  def construct( s, proc_cls, xcel_cls, dump_vcd,
+  def construct( s, ProcClass, XcelClass, dump_vcd,
                  src_delay, sink_delay,
                  mem_stall_prob, mem_latency ):
-
     s.commit_inst = OutPort( Bits1 )
-    req, resp = mk_mem_msg( 8, 32, 32 )
 
     s.src  = TestSrcCL ( Bits32, [], src_delay, src_delay   )
     s.sink = TestSinkCL( Bits32, [], sink_delay, sink_delay )
+    s.mem  = MemoryCL  ( 2, latency = mem_latency )
 
-    s.dut  = ProcXcel( proc_cls, xcel_cls )
+    s.dut  = ProcXcel  ( ProcClass, XcelClass )(
+      mngr2proc = s.src.send,
+      proc2mngr = s.sink.recv,
+      imem      = s.mem.ifc[0],
+      dmem      = s.mem.ifc[1],
 
-    s.mem  = MemoryCL(2, latency = mem_latency)
+      commit_inst = s.commit_inst,
+    )
 
-    # Processor <-> Proc/Mngr
-    s.connect( s.dut.commit_inst, s.commit_inst )
-
-    s.connect( s.src.send, s.dut.mngr2proc )
-    s.connect( s.dut.proc2mngr, s.sink.recv )
-
-    # Processor <-> Memory
-
-    s.connect( s.dut.imem,  s.mem.ifc[0] )
-    s.connect( s.dut.dmem,  s.mem.ifc[1] )
 
   #-----------------------------------------------------------------------
   # load
@@ -200,14 +194,14 @@ def main():
     assert opts.xcel_impl == "rtl" or opts.xcel_impl == "null", \
       "--translate option can only be used with NullXcel or RTL accelerator!"
 
-  # If --xcel null is true, then only cksum-null is valid as input
+  # If --xcel null is true, then only cksum is valid as bmark
   if opts.xcel_impl == 'null':
-    assert opts.input == 'cksum-null', \
-      "--xcel-impl null option can only be used with cksum-null input!"
+    assert opts.bmark == 'cksum', \
+      "--xcel-impl null option can only be used with cksum bmark!"
 
   # Assemble the test program
 
-  mem_image = input_dict[ opts.input ].gen_mem_image()
+  mem_image = bmark_dict[ opts.bmark ].gen_mem_image()
 
   #-----------------------------------------------------------------------
   # Setup simulator
@@ -267,7 +261,7 @@ def main():
   # Verify the results of simulation
 
   print
-  passed = input_dict[ opts.input ].verify( model.mem.mem.mem )
+  passed = bmark_dict[ opts.bmark ].verify( model.mem.mem.mem )
   print
 
   if not passed:

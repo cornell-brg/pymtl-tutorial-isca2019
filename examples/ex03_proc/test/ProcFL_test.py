@@ -1,8 +1,8 @@
 """
 =========================================================================
- ProcFL_test.py
+ProcFL_test.py
 =========================================================================
- Includes test cases for the functional level TinyRV0 processor.
+Includes test cases for the functional level TinyRV0 processor.
 
 Author : Shunning Jiang, Yanghui Ou
   Date : June 12, 2019
@@ -69,10 +69,6 @@ class ProcFL_Tests( object ):
 
     # Force a test failure if we timed out
     assert ncycles < max_cycles
-
-    th.tick()
-    print("{:3}: {}".format( ncycles, th.line_trace() ))
-    ncycles += 1
 
   #-----------------------------------------------------------------------
   # add

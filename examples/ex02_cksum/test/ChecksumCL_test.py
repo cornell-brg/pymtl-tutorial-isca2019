@@ -1,6 +1,6 @@
 """
 ==========================================================================
- ChecksumCL_test.py
+ChecksumCL_test.py
 ==========================================================================
 Test cases for CL checksum unit.
 
@@ -81,6 +81,7 @@ def checksum_cl( words ):
 from .ChecksumFL_test import ChecksumFL_Tests as BaseTests
 
 class ChecksumCL_Tests( BaseTests ):
+
   def cksum_func( s, words ):
     return checksum_cl( words )
 
@@ -93,10 +94,10 @@ class ChecksumCL_Tests( BaseTests ):
   # this new test_hypothesis method is correctly indented with respect
   # to the class ChecksumCL_Tests
   #
-  #   @hypothesis.given(
-  #     words = st.lists( pm_st.bits(16), min_size=8, max_size=8 )
-  #   )
   #   @hypothesis.settings( deadline=None )
+  #   @hypothesis.given(
+  #     words=st.lists( pm_st.bits(16), min_size=8, max_size=8 )
+  #   )
   #   def test_hypothesis( s, words ):
   #     print( [ int(x) for x in words ] )
   #     assert s.cksum_func( words ) == checksum( words )
@@ -156,15 +157,12 @@ class TestHarness( Component ):
 
 class ChecksumCLSrcSink_Tests( object ):
 
-  #-----------------------------------------------------------------------
-  # setup_class
-  #-----------------------------------------------------------------------
-  # Will be called by pytest before running all the tests in the test
-  # class. Here we specify the type of the design under test that is used
-  # in all test cases. We can easily reuse all the tests in this class
-  # simply by creating a new test class that inherits from this class and
-  # overwrite the setup_class to provide a different DUT type.
-
+  # [setup_class] will be called by pytest before running all the tests in
+  # the test class. Here we specify the type of the design under test
+  # that is used in all test cases. We can easily reuse all the tests in
+  # this class simply by creating a new test class that inherits from
+  # this class and overwrite the setup_class to provide a different DUT
+  # type.
   @classmethod
   def setup_class( cls ):
     cls.DutType = ChecksumCL
@@ -196,7 +194,7 @@ class ChecksumCLSrcSink_Tests( object ):
     assert ncycles < max_cycles
 
   #-----------------------------------------------------------------------
-  # test_simple
+  # test_srcsink_simple
   #-----------------------------------------------------------------------
   # is a simple test case with only 1 input.
 
@@ -213,7 +211,7 @@ class ChecksumCLSrcSink_Tests( object ):
     s.run_sim( th )
 
   #-----------------------------------------------------------------------
-  # test_pipeline
+  # test_srcsink_pipeline
   #-----------------------------------------------------------------------
   # test the checksum unit with a sequence of inputs.
 
@@ -233,7 +231,7 @@ class ChecksumCLSrcSink_Tests( object ):
     s.run_sim( th )
 
   #-----------------------------------------------------------------------
-  # test_backpressure
+  # test_srcsink_backpressure
   #-----------------------------------------------------------------------
   # test the checksum unit with a large sink delay.
 

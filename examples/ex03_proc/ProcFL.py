@@ -1,6 +1,6 @@
 """
 ==========================================================================
- ProcFL
+ProcFL
 ==========================================================================
 TinyRV0 FL proc.
 
@@ -128,5 +128,5 @@ class ProcFL( Component ):
 
   def line_trace( s ):
     if s.commit_inst:
-      return "{:0>8s} {: <24}".format( str(s.PC), disassemble_inst( s.raw_inst ) )
-    return "#".ljust(33)
+      return "[{:0>8s} {: <24}]".format( str(s.PC), disassemble_inst( s.raw_inst ) )
+    return "[{}]".format( "#".ljust(33) )

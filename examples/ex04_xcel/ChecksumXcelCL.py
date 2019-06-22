@@ -19,28 +19,7 @@ from examples.ex02_cksum.ChecksumRTL import ChecksumRTL
 from examples.ex02_cksum.utils import words_to_b128
 
 #-------------------------------------------------------------------------
-# A piece of CL logic that converts Bits32 to a response message
-#-------------------------------------------------------------------------
-
-class CombLogicCL( Component ):
-
-  def construct( s ):
-    _, Resp = mk_xcel_msg( 5, 32 )
-    s.Resp = Resp
-    s.data = None
-
-    s.add_constraints( M(s.write) < M(s.read) )
-
-  @method_port
-  def write( data ):
-    s.data = b32(data)
-
-  @method_port
-  def read( type_ ):
-    return s.Resp( b1(type_), s.data )
-
-#-------------------------------------------------------------------------
-# A piece of CL logic that converts Bits32 to a response message
+# ChecksumXcelCL
 #-------------------------------------------------------------------------
 
 class ChecksumXcelCL( Component ):
@@ -73,8 +52,6 @@ class ChecksumXcelCL( Component ):
 
     s.state = s.XCFG
 
-
-    # TODO: replace out_q with a combinational adapter
     s.out_q = BypassQueueCL( num_entries=1 )
 
     s.connect( s.checksum_unit.send, s.out_q.enq )
@@ -111,7 +88,7 @@ class ChecksumXcelCL( Component ):
         if s.out_q.deq.rdy():
           s.reg_file[5] = s.out_q.deq()
           s.state = s.XCFG
-  
+  #-----------------------------------------------------------------------
   # [get_words] is a helper function that extracts the 128-bit input from
   # the register file.
   def get_words( s ):
